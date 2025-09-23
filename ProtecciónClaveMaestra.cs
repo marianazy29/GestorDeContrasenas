@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace GestorDeContraseñas
 {
-    public class ClaveMaestra
+    public class ProtecciónClaveMaestra
     {
-        public string ClaveMaestraD {  get; set; }
+        public readonly string ProtectorClaveMaestra = "Tja#*@2025.UCB";
     }
 }

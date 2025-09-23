@@ -74,11 +74,25 @@ class Program
                 break;
             }
         }
+       
+        BaseDeDatos baseDeDatos = new BaseDeDatos();
+        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
+        CriptografiaServicio criotografiaServicio = new CriptografiaServicio(criptografiaMaster.DecryptString(baseDeDatos.recuperarClaveMaestra()));
+        baseDeDatos.guardarNuevaClave(criotografiaServicio.EncryptString(servicio), criotografiaServicio.EncryptString(usuarioOEmail), criotografiaServicio.EncryptString(clave));
 
         Console.WriteLine("\nContraseña guardada exitosamente para " + servicio);
         Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");
         Console.ReadKey(true);
         MostrarMenuPrincipal();
+    }
+
+    static void ConsolaVerContraseñasAlmacenadas()
+    {
+        Console.Clear();
+        Console.Write("\n");
+        Console.WriteLine("|=================================|");
+        Console.WriteLine("|     CONTRASEÑAS ALMACENADAS     |");
+        Console.WriteLine("|=================================|");
     }
 
     static void ConsolaCambiarContraseñaMaestra()
@@ -107,9 +121,9 @@ class Program
             }
             
         }
-        CriptografiaServicio servicio = new CriptografiaServicio(nuevaClave);
+        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
         BaseDeDatos baseDeDatos = new BaseDeDatos();
-        string claveCifrada = servicio.EncryptString(nuevaClave);
+        string claveCifrada = criptografiaMaster.EncryptString(nuevaClave);
         baseDeDatos.guardarClaveMaestra(claveCifrada);
         Console.WriteLine("\nContraña maestra actualizada correctamente.");
         Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");

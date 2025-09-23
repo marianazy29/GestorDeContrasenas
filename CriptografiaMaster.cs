@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -7,21 +7,14 @@ using System.Threading.Tasks;
 
 namespace GestorDeContraseñas
 {
-    public class CriptografiaServicio
+    public class CriptografiaMaster
     {
-        private readonly byte[] _key;
-      
-        public CriptografiaServicio(string claveMaestra)
-        {
-           
-            using var sha = SHA256.Create();
-            _key = sha.ComputeHash(Encoding.UTF8.GetBytes(claveMaestra));
-        }
+        private static readonly byte[] Key = Encoding.UTF8.GetBytes("Tja-UCB@2025*_!/");
 
         public string EncryptString(string plain)
         {
             using var aes = Aes.Create();
-            aes.Key = _key;
+            aes.Key = Key;
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
             aes.GenerateIV();
@@ -42,7 +35,7 @@ namespace GestorDeContraseñas
             var full = Convert.FromBase64String(base64);
 
             using var aes = Aes.Create();
-            aes.Key = _key;
+            aes.Key = Key;
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
 
@@ -57,7 +50,5 @@ namespace GestorDeContraseñas
 
             return Encoding.UTF8.GetString(plain);
         }
-
-       
     }
 }
