@@ -30,13 +30,57 @@ class Program
         string opcion = Console.ReadLine()!;
 
         switch(opcion) {
+            case "1":
+                ConsolaAgregarContraseña();
+                break;
             case "5":
                 ConsolaCambiarContraseñaMaestra();
                 break;
-               
+            case "6":
+                Salir();
+                break;
+
         }
     }
-    
+
+    static void ConsolaAgregarContraseña()
+    {
+        Console.Clear();
+        Console.Write("\n");
+        Console.WriteLine("|=================================|");
+        Console.WriteLine("|       AGREGAR CONTRASEÑA        |");
+        Console.WriteLine("|=================================|");
+        Console.Write("\nIngrese el nombre del serivicio: ");
+        string servicio = Console.ReadLine();
+
+        Console.Write("\nIngrese usuario o email: ");
+        string usuarioOEmail = Console.ReadLine();
+
+        string clave = "";
+        string claveConfirmacion = "";
+        while (true)
+        {
+            Console.Write("\nIngrese contraseña: ");
+            clave = OcultarClave();
+            Console.Write("\nConfirme contraseña: ");
+            claveConfirmacion = OcultarClave();
+
+            if (clave != claveConfirmacion)
+            {
+                Console.WriteLine("\nLas contraseñas no coinciden por favor vuelva a intentar.");
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        Console.WriteLine("\nContraseña guardada exitosamente para " + servicio);
+        Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");
+        Console.ReadKey(true);
+        MostrarMenuPrincipal();
+    }
+
     static void ConsolaCambiarContraseñaMaestra()
     {
         Console.Clear();
@@ -48,10 +92,10 @@ class Program
         string nuevaClaveConfirmacion = "";
         while (true)
         {
-            Console.Write("\nIntoduce nueva contraseña maestra: ");
-            nuevaClave = Console.ReadLine()!;
-            Console.Write("\nConfirma nueva contraseña maestra: ");
-            nuevaClaveConfirmacion = Console.ReadLine()!;
+            Console.Write("\nIngrese nueva contraseña maestra: ");
+            nuevaClave = OcultarClave();
+            Console.Write("\nConfirme nueva contraseña maestra: ");
+            nuevaClaveConfirmacion = OcultarClave();
 
             if (nuevaClave != nuevaClaveConfirmacion)
             {
@@ -68,19 +112,46 @@ class Program
         string claveCifrada = servicio.EncryptString(nuevaClave);
         baseDeDatos.guardarClaveMaestra(claveCifrada);
         Console.WriteLine("\nContraña maestra actualizada correctamente.");
-        Console.WriteLine("\nPresione 0 para volver al menú principal o enter para salir.");
-        string opción = Console.ReadLine()!;
-        if (opción == "0")
-        {
-            MostrarMenuPrincipal();
-        }
-        else
-        {
-            Console.ReadKey();
-        }
+        Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");
+        Console.ReadKey(true);
+        MostrarMenuPrincipal();
     }
-       
-    
 
+    static string OcultarClave()
+    {
+        string clave = "";
+        ConsoleKeyInfo tecla;
+
+        do
+        {
+            tecla = Console.ReadKey(intercept: true); 
+            if (tecla.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                break;
+            }
+            else if (tecla.Key == ConsoleKey.Backspace)
+            {
+                if (clave.Length > 0)
+                {
+                    clave = clave.Substring(0, clave.Length - 1);
+                    Console.Write("\b \b");
+                }
+            }
+            else
+            {
+                clave += tecla.KeyChar;
+                Console.Write("*");
+            }
+
+        } while (true);
+
+        return clave;
+    }
+
+    static void Salir()
+    {
+        Console.ReadKey(true);
+    }
 
 }
