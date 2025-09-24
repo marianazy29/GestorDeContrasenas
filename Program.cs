@@ -56,6 +56,22 @@ class Program
         Console.WriteLine("|=================================|");
         Console.WriteLine("|       AGREGAR CONTRASEÑA        |");
         Console.WriteLine("|=================================|");
+        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();       
+        BaseDeDatos baseDeDatos = new BaseDeDatos();
+        string claveMaestra = "";
+        while (true)
+        {
+            Console.Write("\nIngrese contraseña maestra: ");
+            claveMaestra = OcultarClave();
+            if (criptografiaMaster.ConvertirHash(claveMaestra) != baseDeDatos.recuperarClaveMaestra())
+            {
+                Console.WriteLine("\nLas contraseñas maestra no coincide, intente nuevamente.");
+            }
+            else
+            {
+                break;
+            }
+        }
         Console.Write("\nIngrese el nombre del serivicio: ");
         string servicio = Console.ReadLine();
 
@@ -73,18 +89,16 @@ class Program
 
             if (clave != claveConfirmacion)
             {
-                Console.WriteLine("\nLas contraseñas no coinciden por favor vuelva a intentar.");
+                Console.WriteLine("\nLa contraseña no coinciden por favor vuelva a intentar.");
             }
             else
             {
                 break;
             }
         }
-       
-        BaseDeDatos baseDeDatos = new BaseDeDatos();
-        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
-        CriptografiaServicio criotografiaServicio = new CriptografiaServicio(criptografiaMaster.DecryptString(baseDeDatos.recuperarClaveMaestra()));
-        baseDeDatos.guardarNuevaClave(criotografiaServicio.EncryptString(servicio), criotografiaServicio.EncryptString(usuarioOEmail), criotografiaServicio.EncryptString(clave));
+
+        CriptografiaServicio criptografiaServicio = new CriptografiaServicio(claveMaestra);
+        baseDeDatos.guardarNuevaClave(criptografiaServicio.EncryptString(servicio), criptografiaServicio.EncryptString(usuarioOEmail), criptografiaServicio.EncryptString(clave));
 
         Console.WriteLine("\nContraseña guardada exitosamente para " + servicio);
         Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");
@@ -99,8 +113,24 @@ class Program
         Console.WriteLine("|===========================================================================|");
         Console.WriteLine("|                           CONTRASEÑAS ALMACENADAS                         |");
         Console.WriteLine("|===========================================================================|");
-        Console.Write("\n");        
-        ListarClaves();
+        Console.Write("\n");
+        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
+        BaseDeDatos baseDeDatos = new BaseDeDatos();
+        string claveMaestra = "";
+        while (true)
+        {
+            Console.Write("\nIngrese contraseña maestra: ");
+            claveMaestra = OcultarClave();
+            if (criptografiaMaster.ConvertirHash(claveMaestra) != baseDeDatos.recuperarClaveMaestra())
+            {
+                Console.WriteLine("\nLa contraseña maestra no coincide, intente nuevamente.");
+            }
+            else
+            {
+                break;
+            }
+        }
+        ListarClaves(claveMaestra);
         Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");
         Console.ReadKey(true);
         MostrarMenuPrincipal();
@@ -133,7 +163,7 @@ class Program
         }
         CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
         BaseDeDatos baseDeDatos = new BaseDeDatos();
-        string claveCifrada = criptografiaMaster.EncryptString(nuevaClave);
+        string claveCifrada = criptografiaMaster.ConvertirHash(nuevaClave);
         baseDeDatos.guardarClaveMaestra(claveCifrada);
         Console.WriteLine("\nContraña maestra actualizada correctamente.");
         Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");
@@ -148,19 +178,36 @@ class Program
         Console.WriteLine("|                             ELIMINAR CONTRASEÑA                           |");
         Console.WriteLine("|===========================================================================|");
         Console.Write("\n");
-        ListarClaves();      
+        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
+        BaseDeDatos baseDeDatos = new BaseDeDatos();
+        string claveMaestra = "";
+        while (true)
+        {
+            Console.Write("\nIngrese contraseña maestra: ");
+            claveMaestra = OcultarClave();
+            if (criptografiaMaster.ConvertirHash(claveMaestra) != baseDeDatos.recuperarClaveMaestra())
+            {
+                Console.WriteLine("\nLa contraseña maestra no coincide, intente nuevamente.");
+            }
+            else
+            {
+                break;
+            }
+        }
+        ListarClaves(claveMaestra);      
         while (true) {
             Console.Write("\nSeleccione un número para eliminar contraseña o 0 para volver: ");
             int numero = int.Parse(Console.ReadLine()!);
             if (numero != 0) {
                 BaseDeDatos _baseDeDatos = new BaseDeDatos();
                 _baseDeDatos.EliminarClave(numero - 1);
-                ListarClaves();
+                Console.WriteLine("\nContraseña eliminada exitosamente. ");
+                Console.WriteLine("\n");
+                ListarClaves(claveMaestra);
             }
             else { break;  }
         }
-        MostrarMenuPrincipal();
-       
+        MostrarMenuPrincipal();       
 
     }
 
@@ -196,11 +243,10 @@ class Program
         return clave;
     }
 
-    static void ListarClaves()
+    static void ListarClaves(string claveMaestra)
     {
         BaseDeDatos baseDeDatos = new BaseDeDatos();
-        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
-        CriptografiaServicio criotografiaServicio = new CriptografiaServicio(criptografiaMaster.DecryptString(baseDeDatos.recuperarClaveMaestra()));
+        CriptografiaServicio criotografiaServicio = new CriptografiaServicio(claveMaestra);
         var registros = baseDeDatos.listarClavesAlmacenadas();
         int count = 0;
         Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}", "N°", "SERVICIO", "USUARIO", "FECHA");
@@ -210,7 +256,7 @@ class Program
             var servicio = criotografiaServicio.DecryptString(r.Servicio);
             var usuarioEmail = criotografiaServicio.DecryptString(r.Usuaro_O_Emial);
             var fecha = r.Fecha;
-            Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}", count += 1, servicio, usuarioEmail, fecha);
+           Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}", count += 1, servicio, usuarioEmail, fecha);
         }
         Console.WriteLine("-----------------------------------------------------------------------------");
     }
