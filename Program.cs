@@ -33,6 +33,12 @@ class Program
             case "1":
                 ConsolaAgregarContraseña();
                 break;
+            case "2":
+                ConsolaVerContraseñasAlmacenadas();
+                break;
+            case "4":
+                ConsolaVerContraseñasAlmacenadas();
+                break;
             case "5":
                 ConsolaCambiarContraseñaMaestra();
                 break;
@@ -90,11 +96,29 @@ class Program
     {
         Console.Clear();
         Console.Write("\n");
-        Console.WriteLine("|=================================|");
-        Console.WriteLine("|     CONTRASEÑAS ALMACENADAS     |");
-        Console.WriteLine("|=================================|");
+        Console.WriteLine("|===========================================================================|");
+        Console.WriteLine("|                           CONTRASEÑAS ALMACENADAS                         |");
+        Console.WriteLine("|===========================================================================|");
+        Console.Write("\n");
+        Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}", "N°", "SERVICIO", "USUARIO", "FECHA");
+        Console.WriteLine("----------------------------------------------------------------------------");
+        BaseDeDatos baseDeDatos = new BaseDeDatos();
+        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
+        CriptografiaServicio criotografiaServicio = new CriptografiaServicio(criptografiaMaster.DecryptString(baseDeDatos.recuperarClaveMaestra()));
+        var registros = baseDeDatos.listarClavesAlmacenadas();
+        int count = 0;
+        foreach(var r in registros)
+        {
+            var servicio = criotografiaServicio.DecryptString(r.Servicio);
+            var usuarioEmail = criotografiaServicio.DecryptString(r.Usuaro_O_Emial);
+            var fecha = r.Fecha;
+            Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}",count+=1,servicio,usuarioEmail,fecha);
+        }
+        Console.WriteLine("-----------------------------------------------------------------------------");
+        Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");
+        Console.ReadKey(true);
+        MostrarMenuPrincipal();
     }
-
     static void ConsolaCambiarContraseñaMaestra()
     {
         Console.Clear();
@@ -130,6 +154,15 @@ class Program
         Console.ReadKey(true);
         MostrarMenuPrincipal();
     }
+    static void ConsolaEliminarContraseña()
+    {
+        Console.Clear();
+        Console.Write("\n");
+        Console.WriteLine("|=================================|");
+        Console.WriteLine("|      ELIMINAR CONTRASEÑA        |");
+        Console.WriteLine("|=================================|");
+        
+    }
 
     static string OcultarClave()
     {
@@ -162,7 +195,6 @@ class Program
 
         return clave;
     }
-
     static void Salir()
     {
         Console.ReadKey(true);
