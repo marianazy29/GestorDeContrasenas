@@ -26,7 +26,6 @@ namespace GestorDeContraseñas
             string linea = $"{servicio}|{usuario}|{claveCifrada}|{DateOnly.FromDateTime(DateTime.Now)}";
             File.AppendAllText(rutaClaves, linea + Environment.NewLine);
         }
-
         public List<Registro> listarClavesAlmacenadas()
         {
            var lista = new List<Registro>();
@@ -48,6 +47,12 @@ namespace GestorDeContraseñas
            }
 
            return lista;
+        }
+        public void EliminarClave(int fila)
+        {
+            List<string> lineas = File.ReadAllLines(rutaClaves).ToList();
+            lineas.RemoveAt(fila);
+            File.WriteAllLines(rutaClaves, lineas);
         }
     }
 }

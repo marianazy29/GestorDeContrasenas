@@ -37,7 +37,7 @@ class Program
                 ConsolaVerContraseñasAlmacenadas();
                 break;
             case "4":
-                ConsolaVerContraseñasAlmacenadas();
+                ConsolaEliminarContraseña();
                 break;
             case "5":
                 ConsolaCambiarContraseñaMaestra();
@@ -99,22 +99,8 @@ class Program
         Console.WriteLine("|===========================================================================|");
         Console.WriteLine("|                           CONTRASEÑAS ALMACENADAS                         |");
         Console.WriteLine("|===========================================================================|");
-        Console.Write("\n");
-        Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}", "N°", "SERVICIO", "USUARIO", "FECHA");
-        Console.WriteLine("----------------------------------------------------------------------------");
-        BaseDeDatos baseDeDatos = new BaseDeDatos();
-        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
-        CriptografiaServicio criotografiaServicio = new CriptografiaServicio(criptografiaMaster.DecryptString(baseDeDatos.recuperarClaveMaestra()));
-        var registros = baseDeDatos.listarClavesAlmacenadas();
-        int count = 0;
-        foreach(var r in registros)
-        {
-            var servicio = criotografiaServicio.DecryptString(r.Servicio);
-            var usuarioEmail = criotografiaServicio.DecryptString(r.Usuaro_O_Emial);
-            var fecha = r.Fecha;
-            Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}",count+=1,servicio,usuarioEmail,fecha);
-        }
-        Console.WriteLine("-----------------------------------------------------------------------------");
+        Console.Write("\n");        
+        ListarClaves();
         Console.WriteLine("\nPresione cualquier tecla para volver al menú principal.");
         Console.ReadKey(true);
         MostrarMenuPrincipal();
@@ -158,10 +144,24 @@ class Program
     {
         Console.Clear();
         Console.Write("\n");
-        Console.WriteLine("|=================================|");
-        Console.WriteLine("|      ELIMINAR CONTRASEÑA        |");
-        Console.WriteLine("|=================================|");
-        
+        Console.WriteLine("|===========================================================================|");
+        Console.WriteLine("|                             ELIMINAR CONTRASEÑA                           |");
+        Console.WriteLine("|===========================================================================|");
+        Console.Write("\n");
+        ListarClaves();      
+        while (true) {
+            Console.Write("\nSeleccione un número para eliminar contraseña o 0 para volver: ");
+            int numero = int.Parse(Console.ReadLine()!);
+            if (numero != 0) {
+                BaseDeDatos _baseDeDatos = new BaseDeDatos();
+                _baseDeDatos.EliminarClave(numero - 1);
+                ListarClaves();
+            }
+            else { break;  }
+        }
+        MostrarMenuPrincipal();
+       
+
     }
 
     static string OcultarClave()
@@ -194,6 +194,25 @@ class Program
         } while (true);
 
         return clave;
+    }
+
+    static void ListarClaves()
+    {
+        BaseDeDatos baseDeDatos = new BaseDeDatos();
+        CriptografiaMaster criptografiaMaster = new CriptografiaMaster();
+        CriptografiaServicio criotografiaServicio = new CriptografiaServicio(criptografiaMaster.DecryptString(baseDeDatos.recuperarClaveMaestra()));
+        var registros = baseDeDatos.listarClavesAlmacenadas();
+        int count = 0;
+        Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}", "N°", "SERVICIO", "USUARIO", "FECHA");
+        Console.WriteLine("----------------------------------------------------------------------------");
+        foreach (var r in registros)
+        {
+            var servicio = criotografiaServicio.DecryptString(r.Servicio);
+            var usuarioEmail = criotografiaServicio.DecryptString(r.Usuaro_O_Emial);
+            var fecha = r.Fecha;
+            Console.WriteLine("{0,-5} {1,-25} {2,-20} {3,-15}", count += 1, servicio, usuarioEmail, fecha);
+        }
+        Console.WriteLine("-----------------------------------------------------------------------------");
     }
     static void Salir()
     {
